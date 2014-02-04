@@ -6,11 +6,9 @@ $(function() {
     , getId = new IdProvider()
   ;
 
-
   // bind keys
   Mousetrap.bind(['del', 'backspace'], deleteSelected);
   Mousetrap.bind('c', deleteAll);
-
 
   // create and setup the map
   var mapOptions = {
@@ -45,7 +43,6 @@ $(function() {
       drawCountry(json);
     });
   }
-
 
   function drawCountry(json) {
 
@@ -89,7 +86,6 @@ $(function() {
       polygons[id] = poly;
     }
 
-    console.log(polygons);
   }
 
   // when passed an array of polygons, attach click handlers to them
