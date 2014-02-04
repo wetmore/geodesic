@@ -12,3 +12,4 @@ Todo
 + Make it look nice
 + Buttons for delete selected/all
 + shift+click+drag to select area
++ Add other libraries as submodules
