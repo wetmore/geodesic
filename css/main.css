@@ -1,0 +1,17 @@
+#country-selector {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+#header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
