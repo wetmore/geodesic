@@ -1,5 +1,9 @@
 $(function() {
 
+  var polygons = []
+    , defaultCountry = 'USA'
+  ;
+
   var mapOptions = {
     zoom: 1,
     center: new google.maps.LatLng(24.886, -70.268),
@@ -12,16 +16,16 @@ $(function() {
   // create the selector for country
   selectDiv = $('#countries');
   for (i in ids) {
-    selectDiv.append('<option value="' + ids[i][1] + '">' + ids[i][0] + '</option>');
+    var html = '<option value="' + ids[i][1] + '">' + ids[i][0] + '</option>';
+    selectDiv.append(html);
   }
   selectDiv.select2();
 
   // handle a new country being selected
   selectDiv.on('change', selectNewCountry);
 
-  retrieveCountryThen('USA', function(json) {
-    drawCountry(json);
-  });
+  // and use that event handler to set the default country
+  selectDiv.select2('val', defaultCountry, true);
 
   function selectNewCountry(e) {
     retrieveCountryThen(this.value, function(json) {
@@ -43,6 +47,8 @@ $(function() {
       geodesic: true
     });
 
+    registerPolygons(country);
+
   }
 
   // call the given callback, supplying it with JSON of the given country
@@ -54,5 +60,13 @@ $(function() {
     };
     xhr.send();
   }
+
+  // add the polygons from the drawn country to the collection
+  function registerPolygons(country) {
+    polygons.concat(country);
+    return country;
+  }
+
+
 
 });
