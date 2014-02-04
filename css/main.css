@@ -2,7 +2,8 @@
   position: absolute;
   bottom: 50px;
   left: 50%;
-  margin: 0 auto;
+  width: 200px;
+  margin-left: -100px;
 }
 
 h1 {

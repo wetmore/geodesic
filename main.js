@@ -1,10 +1,18 @@
 $(function() {
 
-  var polygons = []
+  var polygons = {}
     , defaultCountry = 'USA'
     , selectedPoly = null
+    , getId = new IdProvider()
   ;
 
+
+  // bind keys
+  Mousetrap.bind(['del', 'backspace'], deleteSelected);
+  Mousetrap.bind('c', deleteAll);
+
+
+  // create and setup the map
   var mapOptions = {
     zoom: 1,
     center: new google.maps.LatLng(24.886, -70.268),
@@ -36,8 +44,8 @@ $(function() {
     retrieveCountryThen(this.value, function(json) {
       drawCountry(json);
     });
-
   }
+
 
   function drawCountry(json) {
 
@@ -52,7 +60,7 @@ $(function() {
       geodesic: true
     });
 
-    attachClickHandlers(registerPolygons(country));
+    registerPolygons(country);
 
   }
 
@@ -68,23 +76,34 @@ $(function() {
 
   // add the polygons from the drawn country to the collection
   function registerPolygons(country) {
-    // it's possible we get an array of arrays. This will flatten that if neeeded
+    // it's possible we get an array of arrays. This will flatten that if needed
     var merged = [];
     merged = merged.concat.apply(merged, country);
-    polygons = polygons.concat(merged);
-    return merged;
+
+    // add event handlers
+    var polys = attachClickHandlers(merged);
+
+    for (i in polys) {
+      poly = polys[i];
+      var id = poly.polygon.id;
+      polygons[id] = poly;
+    }
+
+    console.log(polygons);
   }
 
   // when passed an array of polygons, attach click handlers to them
+  // also gives them an id
   function attachClickHandlers(polys) {
-    // this is a job for map, really
-    var handlers = []
+    var handlers = [];
 
     for (i in polys) {
       var polygon = polys[i];
-      handlers.push(google.maps.event.addListener(polygon, 'click', function (event) {
+      polygon.id = getId();
+      handler = google.maps.event.addListener(polygon, 'click', function (event) {
         selectPoly(this);
-      })); 
+      }); 
+      handlers.push({ polygon: polygon, handler: handler });
     }
 
     return handlers;
@@ -152,6 +171,37 @@ $(function() {
 
     polyObj.getPaths().forEach(proccessArray);
 
+  }
+
+  function deletePolygon(id) {
+    var poly = polygons[id].polygon;
+    poly.setMap(null);
+    var handler = poly.handler;
+    google.maps.event.removeListener(handler);
+    delete polygons[id];
+  }
+
+  function deleteSelected() {
+    if (selectedPoly) {
+      deletePolygon(selectedPoly.id);
+      
+      return false;
+    }
+  }
+
+  function deleteAll() {
+    var keys = Object.keys(polygons);
+    for (i in keys) {
+      deletePolygon(keys[i]);
+    }
+  }
+
+  function IdProvider() {
+    var n = 0;
+    return function() {
+      n++;
+      return n;
+    }
   }
 
 });
