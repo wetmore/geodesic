@@ -103,11 +103,6 @@ $(function() {
       strokeColor: '#00FF00'
     });
 
-    // get center
-    setInterval(function() {
-      rotate(polyObj, 10);
-    }, 50);
-
     return polyObj;
   }
 
@@ -139,11 +134,18 @@ $(function() {
   function rotate(polyObj, angle) {
     var center = getCenter(polyObj);
 
+    var earthRadius = 6378137;
+    var maxDist = 1000000;
+
     var proccessArray = function(array) {
       array.forEach(function(latLng, index) {
         var heading = google.maps.geometry.spherical.computeHeading(center, latLng);
         heading += 90;
-        var newLL = google.maps.geometry.spherical.computeOffset(latLng, 400000, heading);
+        var distToPoint = google.maps.geometry.spherical.computeDistanceBetween(center, latLng);
+        // the distance is now proportional to how far the the point is from the
+        // center. this still gives distortion unfortunately
+        var dist = maxDist*Math.sin(distToPoint/(2 * earthRadius));
+        var newLL = google.maps.geometry.spherical.computeOffset(latLng, dist, heading);
         array.setAt(index, newLL);
       })
     }
